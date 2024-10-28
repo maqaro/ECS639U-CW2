@@ -1,0 +1,15 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <h1>Main Page</h1>
+    <h2>Teams</h2>
+    <ul>
+        {% for team in teams %}
+            <li>
+                <a href="{% url 'team' team.id %}">
+                    {{ team.name }} - {{team.city}}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

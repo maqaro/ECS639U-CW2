@@ -1,0 +1,12 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <h1>{{ team.name }}</h1>
+    <h2>{{ team.city }}</h2>
+    <h3>Information</h3>
+    <ul>
+        <li>Founded: {{ team.year_founded }}</li>
+        <li>Coach: {{ team.coach }}</li>
+        <li>Captain: {{ team.captain }}</li>
+    </ul>
+{% endblock %}
