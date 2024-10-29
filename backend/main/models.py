@@ -22,8 +22,8 @@ class LeagueMembership(models.Model):
     
 class League(models.Model):
     name = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
     teams = models.ManyToManyField(Team, through='LeagueMembership')
 
     def __str__(self):
-        return f"{self.name} - ({self.country})"
+        return f"{self.name} - ({self.location})"
