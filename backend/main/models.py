@@ -10,6 +10,15 @@ class Team(models.Model):
     def __str__(self):
         return f"{self.name} - ({self.city})"
     
+    def as_dict(self):
+        return {
+            "name": self.name,
+            "city": self.city,
+            "captain": self.captain,
+            "coach": self.coach,
+            "year_founded": self.year_founded,
+        }
+    
     
 class LeagueMembership(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
@@ -27,3 +36,10 @@ class League(models.Model):
 
     def __str__(self):
         return f"{self.name} - ({self.location})"
+    
+    def as_dict(self):
+        return {
+            "name": self.name,
+            "location": self.location,
+            "teams": [team.as_dict() for team in self.teams.all()]
+        }
