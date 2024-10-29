@@ -10,10 +10,20 @@ class Team(models.Model):
     def __str__(self):
         return f"{self.name} - ({self.city})"
     
-    # class League(models.Model):
-    #     name = models.CharField(max_length=100)
-    #     country = models.CharField(max_length=100)
-    #     teams = models.ManyToManyField(Team, related_name='teams')
+    
+class LeagueMembership(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    league = models.ForeignKey('League', on_delete=models.CASCADE)
+    notes = models.TextField(blank=True)
 
-    #     def __str__(self):
-    #         return f"{self.name} - ({self.country})"
+    def __str__(self):
+        return f"{self.team.name} - {self.league.name}"
+    
+    
+class League(models.Model):
+    name = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    teams = models.ManyToManyField(Team, through='LeagueMembership')
+
+    def __str__(self):
+        return f"{self.name} - ({self.country})"
