@@ -106,7 +106,7 @@ export default {
     },
     data() {
         return {
-            title: 'Team & League Information',
+            title: 'Football Information',
             teams: [],
             leagues: [],
             newTeam: {
