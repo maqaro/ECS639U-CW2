@@ -1,5 +1,5 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
 from .models import Team, League
@@ -27,7 +27,6 @@ def teams_api_view(request):
         })
 
     elif request.method == 'POST':
-        # Handle creating a new team
         try:
             data = json.loads(request.body)
             team = Team.objects.create(
@@ -68,15 +67,11 @@ def teams_api_view(request):
             if not team_id:
                 return JsonResponse({'error': 'Team ID is required'}, status=400)
             
-            team = Team.objects.get(id=team_id)
+            team = get_object_or_404(Team, id=team_id)
             team.delete()
             return JsonResponse({'message': 'Team deleted successfully'}, status=200)
         except Team.DoesNotExist:
             return JsonResponse({'error': 'Team not found'}, status=404)
-        except ValueError:
-            return JsonResponse({'error': 'Invalid data provided'}, status=400)
-
-    return HttpResponse(status=405) 
 
 @csrf_exempt
 def leagues_api_view(request):

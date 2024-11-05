@@ -1,5 +1,5 @@
 <template>
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -23,14 +23,12 @@
                     <button 
                         class="btn btn-sm btn-primary me-2"
                         @click="editTeam(team)"
-                    >
-                        <i class="bi bi-pencil-square"></i>
+                    > Edit
                     </button>
                     <button 
-                        class="btn btn-sm btn-danger"
+                        class="btn btn-sm btn-danger me-2"
                         @click="$emit('delete-team', team)"
-                    >
-                        <i class="bi bi-trash"></i>
+                    > Delete
                     </button>
                 </td>
             </tr>
@@ -46,6 +44,13 @@ export default {
     methods: {
         editTeam(team) {
             this.$emit('edit-team', team);
+        },
+        deleteTeam(team) {
+            if (team && team.id) {
+                this.$emit('delete-team', team);
+            } else {
+                console.error("Invalid team object:", team);
+            }
         }
     }
 }

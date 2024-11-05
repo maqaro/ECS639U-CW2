@@ -12,6 +12,7 @@ class Team(models.Model):
     
     def as_dict(self):
         return {
+            "id": self.id,
             "name": self.name,
             "city": self.city,
             "captain": self.captain,
@@ -39,6 +40,7 @@ class League(models.Model):
     
     def as_dict(self):
         return {
+            "id": self.id,
             "name": self.name,
             "location": self.location,
             "teams": [team.as_dict() for team in self.teams.all()]
