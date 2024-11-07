@@ -2,7 +2,8 @@ import json
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponse
-from .models import Team, League
+from .models import Team, League, LeagueMembership
+from datetime import date, datetime
 
 def index_view(request):
     return render(request, 'main/index.html', {
@@ -17,6 +18,11 @@ def team_view(request, team_id):
 def league_view(request, league_id):
     return render(request, 'main/league.html', {
         'league': League.objects.get(id=league_id)
+    })
+
+def membership_view(request, membership_id):
+    return render(request, 'main/membership.html', {
+        'membership': LeagueMembership.objects.get(id=membership_id)
     })
 
 @csrf_exempt  
@@ -124,3 +130,88 @@ def leagues_api_view(request):
             return JsonResponse({'error': 'Invalid data provided'}, status=400)
 
     return HttpResponse(status=405)
+
+@csrf_exempt
+def memberships_api_view(request):
+    if request.method == 'GET':
+        memberships = LeagueMembership.objects.all()
+        return JsonResponse({
+            'memberships': [{
+                'id': m.id,
+                'team': m.team.as_dict(),
+                'league': m.league.as_dict(),
+                'still_active': m.still_active,
+                'date_joined': m.date_joined.isoformat()
+            } for m in memberships]
+        })
+
+    elif request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            team = Team.objects.get(id=data['team_id'])
+            league = League.objects.get(id=data['league_id'])
+            membership = LeagueMembership.objects.create(
+                team=team,
+                league=league,
+                still_active=data.get('still_active', True),
+                date_joined=data.get('date_joined') or date.today()
+            )
+            return JsonResponse({
+                'id': membership.id,
+                'team': team.as_dict(),
+                'league': league.as_dict(),
+                'still_active': membership.still_active,
+                'date_joined': membership.date_joined.isoformat()
+            })
+        except (KeyError, ValueError, Team.DoesNotExist, League.DoesNotExist) as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    elif request.method == 'DELETE':
+        try:
+            data = json.loads(request.body)
+            membership = LeagueMembership.objects.get(id=data['id'])
+            membership.delete()
+            return JsonResponse({'message': 'Membership deleted successfully'})
+        except (KeyError, LeagueMembership.DoesNotExist):
+            return JsonResponse({'error': 'Membership not found'}, status=404)
+
+    elif request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            print("Received data:", data)
+            
+            membership = LeagueMembership.objects.get(id=data['id'])
+            
+            if 'team_id' in data:
+                team = Team.objects.get(id=data['team_id'])
+                membership.team = team
+            
+            if 'league_id' in data:
+                league = League.objects.get(id=data['league_id'])
+                membership.league = league
+            
+            membership.still_active = data.get('still_active', membership.still_active)
+            
+            if 'date_joined' in data:
+                membership.date_joined = datetime.strptime(data['date_joined'], '%Y-%m-%d').date()
+            
+            membership.save()
+            
+            # Format the response
+            response_data = {
+                'id': membership.id,
+                'team': membership.team.as_dict(),
+                'league': membership.league.as_dict(),
+                'still_active': membership.still_active,
+                'date_joined': membership.date_joined.strftime('%Y-%m-%d')
+            }
+            return JsonResponse(response_data)
+            
+        except LeagueMembership.DoesNotExist:
+            return JsonResponse({'error': 'Membership not found'}, status=404)
+        except (Team.DoesNotExist, League.DoesNotExist) as e:
+            return JsonResponse({'error': str(e)}, status=404)
+        except Exception as e:
+            print("Error:", str(e))  # Debug log
+            return JsonResponse({'error': str(e)}, status=500)
+

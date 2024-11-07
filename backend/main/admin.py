@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Team, League
+from .models import Team, League, LeagueMembership
 
 class LeagueMembershipInline(admin.TabularInline):
     model = League.teams.through
@@ -15,3 +15,8 @@ class TeamAdmin(admin.ModelAdmin):
 class LeagueAdmin(admin.ModelAdmin):
     list_display = ('name', 'location')
     search_fields = ('name', 'location')
+
+@admin.register(LeagueMembership)
+class LeagueMembershipAdmin(admin.ModelAdmin):
+    list_display = ('team', 'league', 'still_active', 'date_joined')
+    search_fields = ('team__name', 'league__name')

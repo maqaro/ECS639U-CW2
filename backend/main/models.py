@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 
 class Team(models.Model):
     name = models.CharField(max_length=100)
@@ -24,7 +25,8 @@ class Team(models.Model):
 class LeagueMembership(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     league = models.ForeignKey('League', on_delete=models.CASCADE)
-    notes = models.TextField(blank=True)
+    still_active = models.BooleanField(default=True)
+    date_joined = models.DateField(default=date.today)
 
     def __str__(self):
         return f"{self.team.name} - {self.league.name}"

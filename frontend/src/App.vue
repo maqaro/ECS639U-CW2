@@ -26,6 +26,17 @@
                     @delete-league="deleteLeague"
                 />
             </template>
+
+            <template #memberships>
+                <button class="btn btn-sm btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addMembershipModal">
+                    <i class="bi bi-plus"></i> Add Membership
+                </button>
+                <MembershipTable 
+                    :memberships="memberships"
+                    @edit-membership="editMembership"
+                    @delete-membership="deleteMembership"
+                />
+            </template>
         </Tabs>
 
         <!-- Team Modal -->
@@ -69,11 +80,12 @@
         </div>
 
         <!-- League Modal -->
+        <!-- Add League Modal -->
         <div class="modal fade" id="addLeagueModal" tabindex="-1" aria-labelledby="addLeagueModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="addLeagueModalLabel">{{ isEditingLeague ? 'Edit League' : 'Add League' }}</h1>
+                        <h1 class="modal-title fs-5" id="addLeagueModalLabel">Add League</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -88,7 +100,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" @click="isEditingLeague ? updateLeague() : createLeague()" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-primary" @click="createLeague()" data-bs-dismiss="modal">
                             Save
                         </button>
                     </div>
@@ -163,6 +175,130 @@
                 </div>
             </div>
         </div>
+
+        <!-- Membership Modal -->
+        <div class="modal fade" id="addMembershipModal" tabindex="-1" aria-labelledby="addMembershipModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addMembershipModalLabel">Add Membership</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="membershipTeam" class="form-label">Team</label>
+                            <select 
+                                v-model="newMembership.team_id" 
+                                class="form-select" 
+                                id="membershipTeam"
+                            >
+                                <option v-for="team in teams" :key="team.id" :value="team.id">
+                                    {{ team.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="membershipLeague" class="form-label">League</label>
+                            <select 
+                                v-model="newMembership.league_id" 
+                                class="form-select" 
+                                id="membershipLeague"
+                            >
+                                <option v-for="league in leagues" :key="league.id" :value="league.id">
+                                    {{ league.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="membershipDate" class="form-label">Date Joined</label>
+                            <input 
+                                type="date" 
+                                class="form-control" 
+                                id="membershipDate"
+                                v-model="newMembership.date_joined"
+                            >
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input 
+                                type="checkbox" 
+                                class="form-check-input" 
+                                id="membershipActive"
+                                v-model="newMembership.still_active"
+                            >
+                            <label class="form-check-label" for="membershipActive">Still Active</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" @click="createMembership()" data-bs-dismiss="modal">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Membership Modal -->
+        <div class="modal fade" id="editMembershipModal" tabindex="-1" aria-labelledby="editMembershipModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="editMembershipModalLabel">Edit Membership</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editMembershipTeam" class="form-label">Team</label>
+                            <select 
+                                v-model="editingMembership.team_id" 
+                                class="form-select" 
+                                id="editMembershipTeam"
+                            >
+                                <option v-for="team in teams" :key="team.id" :value="team.id">
+                                    {{ team.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMembershipLeague" class="form-label">League</label>
+                            <select 
+                                v-model="editingMembership.league_id" 
+                                class="form-select" 
+                                id="editMembershipLeague"
+                            >
+                                <option v-for="league in leagues" :key="league.id" :value="league.id">
+                                    {{ league.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMembershipDate" class="form-label">Date Joined</label>
+                            <input 
+                                type="date" 
+                                class="form-control" 
+                                id="editMembershipDate"
+                                v-model="editingMembership.date_joined"
+                            >
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input 
+                                type="checkbox" 
+                                class="form-check-input" 
+                                id="editMembershipActive"
+                                v-model="editingMembership.still_active"
+                            >
+                            <label class="form-check-label" for="editMembershipActive">Still Active</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" @click="updateMembership()" data-bs-dismiss="modal">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
   
@@ -170,6 +306,7 @@
     import Tabs from './components/Tabs.vue'
     import TeamTable from './components/TeamTable.vue'
     import LeagueTable from './components/LeagueTable.vue'
+    import MembershipTable from './components/MembershipTable.vue'
 
     const baseUrl = 'http://localhost:8000'
 
@@ -177,7 +314,8 @@
     components: {
         Tabs,
         TeamTable,
-        LeagueTable
+        LeagueTable,
+        MembershipTable
     },
     data() {
         return {
@@ -208,7 +346,22 @@
                 captain: '',
                 coach: '',
                 year_founded: 1900
-            }
+            },
+            isEditingMembership: false,
+            editingMembership: {
+                id: null,
+                team_id: null,
+                league_id: null,
+                still_active: true,
+                date_joined: new Date().toISOString().split('T')[0]
+            },
+            newMembership: {
+                team_id: null,
+                league_id: null,
+                still_active: true,
+                date_joined: new Date().toISOString().split('T')[0]
+            },
+            memberships: []
         }
     },
     async mounted() {
@@ -222,6 +375,10 @@
 
         this.teams = teamsData.teams;
         this.leagues = leaguesData.leagues;
+
+        const membershipResponse = await fetch(`${baseUrl}/api/memberships/`);
+        const membershipData = await membershipResponse.json();
+        this.memberships = membershipData.memberships;
     },
     methods: {
         async deleteTeam(team) {
@@ -378,6 +535,128 @@
             } catch (error) {
                 console.error('Error updating league:', error);
                 alert('Failed to update league');
+            }
+        },
+        async createMembership() {
+            try {
+                const response = await fetch(`${baseUrl}/api/memberships/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(this.newMembership)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to create membership');
+                }
+
+                const newMembership = await response.json();
+                this.memberships.push(newMembership);
+
+                this.newMembership = {
+                    team_id: null,
+                    league_id: null,
+                    date_joined: new Date().toISOString().split('T')[0],
+                    still_active: true
+                };
+            } catch (error) {
+                console.error('Error creating membership:', error);
+                alert(error.message);
+            }
+        },
+
+        async deleteMembership(membership) {
+            if (confirm(`Are you sure you want to delete this membership?`)) {
+                try {
+                    const response = await fetch(`${baseUrl}/api/memberships/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ id: membership.id })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete membership');
+                    }
+
+                    this.memberships = this.memberships.filter(m => m.id !== membership.id);
+                } catch (error) {
+                    console.error('Error deleting membership:', error);
+                    alert('Failed to delete membership');
+                }
+            }
+        },
+
+        editMembership(membership) {
+            console.log('Editing membership:', membership); // Debug log
+            this.editingMembership = {
+                id: membership.id,
+                team_id: membership.team.id,
+                league_id: membership.league.id,
+                still_active: membership.still_active,
+                date_joined: membership.date_joined
+            };
+            
+            // Use the bootstrap modal properly
+            const modal = new bootstrap.Modal(document.getElementById('editMembershipModal'));
+            modal.show();
+        },
+
+        async updateMembership() {
+            try {
+                const response = await fetch(`${baseUrl}/api/memberships/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'  // Explicitly request JSON response
+                    },
+                    body: JSON.stringify({
+                        id: this.editingMembership.id,
+                        team_id: parseInt(this.editingMembership.team_id),
+                        league_id: parseInt(this.editingMembership.league_id),
+                        still_active: this.editingMembership.still_active,
+                        date_joined: this.editingMembership.date_joined
+                    })
+                });
+
+                let responseData;
+                try {
+                    responseData = await response.json();
+                } catch (e) {
+                    throw new Error('Server returned invalid JSON');
+                }
+
+                if (!response.ok) {
+                    throw new Error(responseData.error || 'Failed to update membership');
+                }
+
+                // Update the membership in the list
+                const index = this.memberships.findIndex(m => m.id === responseData.id);
+                if (index !== -1) {
+                    this.memberships[index] = responseData;
+                    this.memberships = [...this.memberships];
+                }
+
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editMembershipModal'));
+                if (modal) {
+                    modal.hide();
+                }
+
+                // Reset the editing state
+                this.editingMembership = {
+                    id: null,
+                    team_id: null,
+                    league_id: null,
+                    still_active: true,
+                    date_joined: new Date().toISOString().split('T')[0]
+                };
+            } catch (error) {
+                console.error('Error updating membership:', error);
+                alert(error.message);
             }
         }
     }
