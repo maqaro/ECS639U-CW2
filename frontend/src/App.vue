@@ -539,22 +539,37 @@
         },
         async createMembership() {
             try {
+                if (!this.newMembership.team_id || !this.newMembership.league_id) {
+                    throw new Error('Please select both a team and a league');
+                }
+
                 const response = await fetch(`${baseUrl}/api/memberships/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.newMembership)
+                    body: JSON.stringify({
+                        team_id: this.newMembership.team_id,
+                        league_id: this.newMembership.league_id,
+                        still_active: this.newMembership.still_active,
+                        date_joined: this.newMembership.date_joined
+                    })
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to create membership');
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to create membership');
+                    } else {
+                        throw new Error('Server error: Failed to create membership');
+                    }
                 }
 
                 const newMembership = await response.json();
                 this.memberships.push(newMembership);
 
+                // Reset form
                 this.newMembership = {
                     team_id: null,
                     league_id: null,
@@ -566,7 +581,6 @@
                 alert(error.message);
             }
         },
-
         async deleteMembership(membership) {
             if (confirm(`Are you sure you want to delete this membership?`)) {
                 try {
